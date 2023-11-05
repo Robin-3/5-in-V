@@ -1,3 +1,25 @@
+// Matriz que contiene las posibles líneas ganadoras.
+final Move[][] WINNING_LINES = {
+  {new Move(0, 0), new Move(1, 1), new Move(2, 2), new Move(2, 3), new Move(2, 4)},
+  {new Move(1, 0), new Move(2, 1), new Move(3, 1), new Move(3, 2), new Move(3, 3)},
+  {new Move(2, 0), new Move(3, 0), new Move(4, 0), new Move(4, 1), new Move(4, 2)},
+  {new Move(0, 2), new Move(1, 2), new Move(2, 2), new Move(2, 1), new Move(2, 0)},
+  {new Move(1, 3), new Move(2, 3), new Move(3, 2), new Move(3, 1), new Move(3, 0)},
+  {new Move(2, 4), new Move(3, 3), new Move(4, 2), new Move(4, 1), new Move(4, 0)},
+  {new Move(0, 2), new Move(1, 2), new Move(2, 2), new Move(3, 2), new Move(4, 2)},
+  {new Move(0, 1), new Move(1, 1), new Move(2, 1), new Move(3, 1), new Move(4, 1)},
+  {new Move(0, 0), new Move(1, 0), new Move(2, 0), new Move(3, 0), new Move(4, 0)},
+  {new Move(2, 4), new Move(2, 3), new Move(2, 2), new Move(3, 1), new Move(4, 0)},
+  {new Move(1, 3), new Move(1, 2), new Move(1, 1), new Move(2, 1), new Move(3, 0)},
+  {new Move(0, 2), new Move(0, 1), new Move(0, 0), new Move(1, 0), new Move(2, 0)},
+  {new Move(4, 2), new Move(3, 2), new Move(2, 2), new Move(2, 1), new Move(2, 0)},
+  {new Move(3, 3), new Move(2, 3), new Move(1, 2), new Move(1, 1), new Move(1, 0)},
+  {new Move(2, 4), new Move(1, 3), new Move(0, 2), new Move(0, 1), new Move(0, 0)},
+  {new Move(4, 0), new Move(3, 1), new Move(2, 2), new Move(1, 1), new Move(0, 0)},
+  {new Move(4, 1), new Move(3, 2), new Move(2, 3), new Move(1, 2), new Move(0, 1)},
+  {new Move(4, 2), new Move(3, 3), new Move(2, 4), new Move(1, 3), new Move(0, 2)}
+};
+
 /**
  * Clase que representa un tablero de juego.
  */
@@ -6,31 +28,10 @@ class Board {
   Move[] winningLine;             // Línea ganadora (si existe).
   
   final Cell[][] cells;           // Matriz que almacena las celdas del tablero.
-  final Cell[] players;           // Arreglo que contiene los jugadores.
   final Stack<Move> history;      // Historial de movimientos.
-  final Move[][] winningLines = { // Matriz que contiene las posibles líneas ganadoras.
-    {new Move(0, 0), new Move(1, 1), new Move(2, 2), new Move(2, 3), new Move(2, 4)},
-    {new Move(1, 0), new Move(2, 1), new Move(3, 1), new Move(3, 2), new Move(3, 3)},
-    {new Move(2, 0), new Move(3, 0), new Move(4, 0), new Move(4, 1), new Move(4, 2)},
-    {new Move(0, 2), new Move(1, 2), new Move(2, 2), new Move(2, 1), new Move(2, 0)},
-    {new Move(1, 3), new Move(2, 3), new Move(3, 2), new Move(3, 1), new Move(3, 0)},
-    {new Move(2, 4), new Move(3, 3), new Move(4, 2), new Move(4, 1), new Move(4, 0)},
-    {new Move(0, 2), new Move(1, 2), new Move(2, 2), new Move(3, 2), new Move(4, 2)},
-    {new Move(0, 1), new Move(1, 1), new Move(2, 1), new Move(3, 1), new Move(4, 1)},
-    {new Move(0, 0), new Move(1, 0), new Move(2, 0), new Move(3, 0), new Move(4, 0)},
-    {new Move(2, 4), new Move(2, 3), new Move(2, 2), new Move(3, 1), new Move(4, 0)},
-    {new Move(1, 3), new Move(1, 2), new Move(1, 1), new Move(2, 1), new Move(3, 0)},
-    {new Move(0, 2), new Move(0, 1), new Move(0, 0), new Move(1, 0), new Move(2, 0)},
-    {new Move(4, 2), new Move(3, 2), new Move(2, 2), new Move(2, 1), new Move(2, 0)},
-    {new Move(3, 3), new Move(2, 3), new Move(1, 2), new Move(1, 1), new Move(1, 0)},
-    {new Move(2, 4), new Move(1, 3), new Move(0, 2), new Move(0, 1), new Move(0, 0)},
-    {new Move(4, 0), new Move(3, 1), new Move(2, 2), new Move(1, 1), new Move(0, 0)},
-    {new Move(4, 1), new Move(3, 2), new Move(2, 3), new Move(1, 2), new Move(0, 1)},
-    {new Move(4, 2), new Move(3, 3), new Move(2, 4), new Move(1, 3), new Move(0, 2)}
-  };
 
   /**
-   * Constructor de la clase Board. Inicializa el tablero con celdas vacías y otras variables (jugadores, historial y línea ganadora).
+   * Constructor de la clase Board. Inicializa el tablero con celdas vacías y otras variables (jugador inicial, historial y línea ganadora).
    */
   Board() {
     this.cells = new Cell[iSize][];
@@ -42,8 +43,6 @@ class Board {
         this.cells[i][j] = Cell.EMPTY;
     }
 
-    this.players = new Cell[] {Cell.X, Cell.O};
-
     this.firstPlayer = true;
     this.history = new Stack<>();
     this.winningLine = null;
@@ -54,8 +53,17 @@ class Board {
    *
    * @return Una copia del historial de jugadas como una pila.
    */
-  Stack<Move> getMoveHistory() {
+  Stack getMoveHistory() {
     return (Stack) this.history.clone();
+  }
+  
+  /**
+   * Obtiene el jugador actual (el que tiene el turno).
+   *
+   * @return El jugador actual, Cell.X (X) o Cell.O (O).
+   */
+  Cell getCurrentCell() {
+    return this.firstPlayer? Cell.X : Cell.O;
   }
 
   /**
@@ -73,7 +81,7 @@ class Board {
    */
   void play(Move move) {
     if (this.cells[move.row][move.col] == Cell.EMPTY) {
-      this.cells[move.row][move.col] = this.firstPlayer? this.players[0]: this.players[1];
+      this.cells[move.row][move.col] = this.getCurrentCell();
       this.history.push(move);
       this.switchPlayers();
     }
@@ -98,7 +106,7 @@ class Board {
    * @return El jugador ganador o null si no hay un ganador todavía.
    */
   Cell getWinner() {
-    for (Move[] line : this.winningLines) {
+    for (Move[] line : WINNING_LINES) {
       Move l1 = line[0];
       Move l2 = line[1];
       Move l3 = line[2];
@@ -154,11 +162,25 @@ class Board {
    */
   String getHistory() {
     String history = "";
-    int m = 0;
-    for(Move move : this.getMoveHistory()) {
-      m +=1;
-      history += "\nMove #"+m+": "+move.toString();
+    Stack moves = this.getMoveHistory();
+    while(!moves.isEmpty()) {
+      Move move = (Move) moves.pop();
+      history = "\nMove #"+(moves.size()+1)+": "+move.toString() + history;
     }
     return history;
+  }
+  
+  /**
+   * Obtiene una lista de todos los movimientos posibles en el tablero en su estado actual.
+   *
+   * @return Una lista de objetos Move que representan los movimientos posibles.
+   */
+  List<Move> getAllPossibleMoves() {
+    List<Move> possibleMoves = new ArrayList<>();
+    for (int i = 0; i < this.cells.length; i++)
+      for (int j = 0; j < this.cells[i].length; j++)
+        if (this.cells[i][j] == Cell.EMPTY)
+          possibleMoves.add(new Move(i, j));
+    return possibleMoves;
   }
 }

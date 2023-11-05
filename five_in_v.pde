@@ -1,4 +1,5 @@
 import java.util.Stack;
+import java.util.List;
 
 final int BOARD_SIZE = 3;
 
@@ -13,11 +14,12 @@ Board board = new Board();
 Cell winner = null;
 
 void setup() {
-  size(640, 360, P2D);
+  size(360, 360, P2D);
   surface.setResizable(true);
   surface.setTitle("5 in V");
   textAlign(CENTER, CENTER);
   textSize(28);
+  loadExample(board);
 }
 
 void draw() {
@@ -88,7 +90,7 @@ void draw() {
         messages += "\n\nWinner: "+winner.toString();
       else
         messages += "\n\nDraw";
-      messages += "\n\nLeft click to restart\nRight click to undo\n";
+      messages += "\n\nLeft-click to restart\nRight-click to undo\nKeys 0-9 for AI";
     }
     
     pg.textAlign(CENTER, BOTTOM);
@@ -99,6 +101,21 @@ void draw() {
       image(pg, 0, minSize);
     else
       image(pg, minSize, 0);
+  } else if(!existEmptyCell || winner != null) {
+    noStroke();
+    fill(255, 125);
+    rect(0, 0, width, height);
+    fill(0);
+    String messages = "";
+    
+    if(!existEmptyCell || winner != null) {
+      if(winner != null)
+        messages += "Winner\n"+winner.toString();
+      else
+        messages += "Draw";
+      messages += "\n\nLeft-click to restart\nRight-click to undo\nKeys 0-9 for AI";
+    }
+    text(messages, width/2, height/2);
   }
   
   isClicked = false;
@@ -118,5 +135,19 @@ void mousePressed() {
     board.undo();
     winner = null;
     existEmptyCell = true;
+  }
+}
+
+void keyPressed() {
+  if(keyCode >= 48 && keyCode <= 57) {
+    if(!existEmptyCell || winner != null) {
+      board = new Board();
+      winner = null;
+      existEmptyCell = true;
+    }
+    if(keyCode == 48)
+      board.play(randomMove(board));
+    else
+      board.play(findBestMove(board, keyCode-48));
   }
 }
